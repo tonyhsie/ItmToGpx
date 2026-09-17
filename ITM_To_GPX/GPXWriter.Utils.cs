@@ -10,17 +10,17 @@ namespace GPXWriter
             private double _latitude;
             private double _longitude;
             private double _elevation;
+            private double _speed;
             private DateTime _time;
 
-            public Point(double langitude, double longitude, double elevation, DateTime time)
+            public Point(double langitude, double longitude, double elevation, double speed, DateTime time)
             {
                 _latitude = langitude;
                 _longitude = longitude;
                 _elevation = elevation;
+                _speed = speed;
                 _time = time;
-
             }
-           
 
             public double latitude
             {
@@ -30,7 +30,7 @@ namespace GPXWriter
                 }
                 set
                 {
-                    _latitude = latitude;                    
+                    _latitude = latitude;
                 }
             }
 
@@ -58,28 +58,48 @@ namespace GPXWriter
                 }
             }
 
+            public double speed
+            {
+                get
+                {
+                    return _speed;
+                }
+                set
+                {
+                    _speed = speed;
+                }
+            }
+
             public DateTime time
             {
                 get
                 {
                     return _time;
                 }
-                set
-                {
-
-                }
             }
         }
+
         public class Track
         {
             /// <summary>
-            /// Speichert die TrackSegmente
+            /// 儲存軌跡片段
             /// </summary>
+            
+            private string _Name;
             private ArrayList _TrackSegments;
 
-            public Track()
+            public Track(string sName)
             {
+                _Name = sName;
                 _TrackSegments = new ArrayList();
+            }
+
+            public string name
+            {
+                get
+                {
+                    return _Name;
+                }
             }
 
             public ArrayList TrackSegments
@@ -99,10 +119,11 @@ namespace GPXWriter
                 _TrackSegments.Add(add);
             }
         }
+        
         public class TrackSegment
         {
             /// <summary>
-            /// Speichert die Wegpunkte des _TrackSegments
+            /// 儲存 _TrackSegments 的航點
             /// </summary>
             private ArrayList _Points;
 
@@ -129,5 +150,4 @@ namespace GPXWriter
             }
         }
     }
-
 }

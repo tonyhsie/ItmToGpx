@@ -25,19 +25,21 @@ namespace GPXWriter
                     _Filename = Path.GetFullPath(value);
                 }
             }
+            
             public ArrayList Tracks
             {
                 get
                 {
                     return ArrayList.ReadOnly(_Tracks);
-                }                    
+                }
             }
+            
             public ArrayList WayPoints
             {
                 get
                 {
                     return ArrayList.ReadOnly(_WayPoints);
-                } 
+                }
             }
 
             public GPX(string Filename)
@@ -52,30 +54,31 @@ namespace GPXWriter
                 GPXWrite TmpWriteCache = new GPXWrite(this);
                 TmpWriteCache.Write();
             }
+            
             public void AddTrack(Utils.Track track)
             {
                 _Tracks.Add(track);
             }
+            
             public void AddPoint(GPXWriter.Utils.Point point)
             {
                 _WayPoints.Add(point);
             }
-
         }
+        
         public class GPXWrite
         {
             private GPX _GPX;
             private XmlTextWriter _OutputFile;
-            
+
             public GPXWrite(GPX gpx)
             {
                 if (gpx == null)
                 {
                     throw new Exception("GPX gpx musn't be empty");
                 }
-                   
-                _GPX = gpx;                    
-                    
+
+                _GPX = gpx;
             }
 
             private void WriteHeader()
@@ -84,48 +87,58 @@ namespace GPXWriter
                 _OutputFile.WriteStartElement("gpx");
                 _OutputFile.WriteAttributeString("xmlns", "http://www.topografix.com/GPX/1/1");
                 _OutputFile.WriteAttributeString("creator", "ITMtoGPX");
-                _OutputFile.WriteAttributeString("version", "v1.1.5");
-                _OutputFile.WriteAttributeString("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+                _OutputFile.WriteAttributeString("version", "v260917");
+                _OutputFile.WriteAttributeString("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
                 _OutputFile.WriteAttributeString("xsi:schemaLocation", "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd");
             }
 
             private void WriteBody()
             {
-                //zunächst die Waypoints schreiben
-                foreach(Utils.Point point in _GPX.WayPoints)
+                CultureInfo ci = new CultureInfo("en-US");
+
+                // 首先寫入航點
+                foreach (Utils.Point point in _GPX.WayPoints)
                 {
                     _OutputFile.WriteStartElement("wpt");
-                    _OutputFile.WriteAttributeString("lat", point.latitude.ToString(new CultureInfo("en-US")));
-                    _OutputFile.WriteAttributeString("lon", point.longitude.ToString(new CultureInfo("en-US")));
-                    _OutputFile.WriteElementString("ele", point.elevation.ToString(new CultureInfo("en-US")));
+                    _OutputFile.WriteAttributeString("lat", point.latitude.ToString(ci));
+                    _OutputFile.WriteAttributeString("lon", point.longitude.ToString(ci));
+                    _OutputFile.WriteElementString("ele", point.elevation.ToString(ci));
                     _OutputFile.WriteElementString("time", point.time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"));
+                    string speed = point.speed.ToString(ci);
+                    if (speed != "0")
+                        _OutputFile.WriteElementString("speed", speed);
                     _OutputFile.WriteEndElement();
                 }
 
-                //Dann die Tracks
+                // 接著寫入軌跡
                 foreach (Utils.Track track in _GPX.Tracks)
                 {
-                    _OutputFile.WriteStartElement("trk");                       
+                    _OutputFile.WriteStartElement("trk");
+                    _OutputFile.WriteStartElement("name");
+                    _OutputFile.WriteCData(track.name);
+                    _OutputFile.WriteEndElement();
 
-                    foreach(Utils.TrackSegment tracksegment in track.TrackSegments)
+                    foreach (Utils.TrackSegment tracksegment in track.TrackSegments)
                     {
                         _OutputFile.WriteStartElement("trkseg");
 
                         foreach (Utils.Point point in tracksegment.Points)
                         {
                             _OutputFile.WriteStartElement("trkpt");
-                            _OutputFile.WriteAttributeString("lat", point.latitude.ToString(new CultureInfo("en-US")));
-                            _OutputFile.WriteAttributeString("lon", point.longitude.ToString(new CultureInfo("en-US")));
-
-                            _OutputFile.WriteElementString("ele", point.elevation.ToString(new CultureInfo("en-US")));                                    
-                                _OutputFile.WriteElementString("time", point.time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"));
-                                    
+                            _OutputFile.WriteAttributeString("lat", point.latitude.ToString(ci));
+                            _OutputFile.WriteAttributeString("lon", point.longitude.ToString(ci));
+                            _OutputFile.WriteElementString("ele", point.elevation.ToString(ci));
+                            _OutputFile.WriteElementString("time", point.time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"));
+                            string speed = point.speed.ToString(ci);
+                            if (speed != "0")
+                                _OutputFile.WriteElementString("speed", speed);
                             _OutputFile.WriteEndElement();
                         }
+
                         _OutputFile.WriteEndElement();
                     }
 
-                    _OutputFile.WriteEndElement(); 
+                    _OutputFile.WriteEndElement();
                 }
             }
 

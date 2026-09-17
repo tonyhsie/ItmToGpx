@@ -6,7 +6,7 @@ namespace ITM_To_GPX
     static class Program
     {
         /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
+        /// 應用程式的主要進入點
         /// </summary>
         [STAThread]
         static void Main()
