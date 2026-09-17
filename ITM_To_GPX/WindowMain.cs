@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Windows.Forms;
-using System.Collections;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
-using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using ITM_To_GPX.Utils;
 using GPXWriter.Main;
 
@@ -20,21 +12,20 @@ namespace ITM_To_GPX
     {
         public WindowMain()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void ButtonOpen_Click(object sender, EventArgs e)
         {
-            // OpenFileDialog Instanz erstellen und einen "Öffnen...." Dialog anzeigen, 
-            // indem mehrere Dateien ausgewählt werden können, die anschließend in die
-            // ListBoxOpened eingefügt werden
+            // 建立 OpenFileDialog 執行個體並顯示一個「開啟...」對話方塊， 
+            // 允許選擇多個檔案，然後將這些檔案加入至
+            // ListBoxOpened 之中
             OpenFileDialog TmpFileDialog = new OpenFileDialog();
             TmpFileDialog.Multiselect = true;
             TmpFileDialog.Filter = "GPSPhototagger File (*.itm)|*.itm";
 
             if (TmpFileDialog.ShowDialog() == DialogResult.OK)
             {
-
                 ListBoxOpened.BeginUpdate();
 
                 foreach (string TmpPfad in TmpFileDialog.FileNames)
@@ -43,67 +34,58 @@ namespace ITM_To_GPX
                 }
 
                 ListBoxOpened.EndUpdate();
-
             }
-
- 
         }
 
         private void ButtonConvert_Click(object sender, EventArgs e)
         {
-            //Lege einen Buffer für später an
+            // 建立一個供稍後使用的緩衝區
             byte[] Buffer = new Byte[4096];
 
-            //Frag den Ort ab, an dem die GPX gespeichert werden sollen
-            FolderBrowserDialog TmpFolderBrowser = new FolderBrowserDialog();
-            TmpFolderBrowser.ShowDialog();
-
             foreach (object TmpObject in ListBoxOpened.Items)
-            {   
-                //ZipFile initalisieren zum Entpacken
+            {
+                // 初始化 ZipFile 以進行解壓縮
                 ZipFile TmpFile = null;
 
                 try
                 {
-                    //Öffne die Datei aus dem Kasten
+                    // 開啟清單中的檔案
                     TmpFile = new ZipFile(TmpObject.ToString());
 
-                    //Gehe Alle Dateien durch
+                    // 走訪所有的檔案
                     foreach (ZipEntry TmpEntry in TmpFile)
                     {
-                        //Bis eine den namen ituser.poi hat
+                        // 直到找到名稱為 ituser.poi 的檔案
                         if (TmpEntry.IsFile && TmpEntry.Name == "ituser.poi\0")
                         {
-                            //Wenn das so ist, dann hole dir einen Stream auf dieses File                           
+                            // 若找到該檔案，則取得該檔案的資料流 (Stream)                           
                             Stream TmpFileStream = TmpFile.GetInputStream(TmpEntry);
 
-                            //erstelle den neuen Dateinamen, indem du den vorhin ausgewählten Pfad nimmst
-                            string TmpFullPath = Path.Combine(TmpFolderBrowser.SelectedPath, "ituser.poi");
-                            
-                            //und erstelle die Datei
+                            // 結合原始 itm 檔案的路徑，建立新的檔案名稱
+                            string sInputFileDir = Path.GetDirectoryName(TmpObject.ToString());
+                            string TmpFullPath = Path.Combine(sInputFileDir, "ituser.poi");
+
+                            // 並建立檔案
                             using (FileStream TmpOutput = File.Create(TmpFullPath))
-                            {     
-                                //anschließend kopiere sie aus der zip dorthin und schließe sie
+                            {
+                                // 接著將檔案從 zip 中複製過去，然後關閉檔案
                                 StreamUtils.Copy(TmpFileStream, TmpOutput, Buffer);
                                 TmpOutput.Close();
 
-                                //Jetzt erstelle ein GPX und SQL Objekt
+                                // 現在建立 GPX 與 SQL 物件
                                 SQLiteFile sqlitefile = new SQLiteFile(TmpFullPath);
-                                GPX gpxfile = new GPX(Path.Combine(TmpFolderBrowser.SelectedPath,Path.ChangeExtension(Path.GetFileName(TmpObject.ToString()),".gpx")));
+                                GPX gpxfile = new GPX(Path.Combine(sInputFileDir, Path.ChangeExtension(Path.GetFileName(TmpObject.ToString()), ".gpx")));
 
-                                //Gpx File erstellen
+                                // 建立 Gpx 檔案
                                 sqlitefile.SQLiteToGPX(gpxfile);
 
-                                //und schreiben
+                                // 並寫入檔案
                                 gpxfile.WriteGPX();
 
-                                //TmpOutput löschen
+                                // 刪除 TmpOutput 暫存檔
                                 File.Delete(TmpFullPath);
                             }
-
-
                         }
-
                     }
                 }
                 finally
@@ -116,6 +98,7 @@ namespace ITM_To_GPX
                 }
             }
 
+            MessageBox.Show("Done!", "Converted", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ButtonDelete_Click(object sender, EventArgs e)
@@ -123,17 +106,16 @@ namespace ITM_To_GPX
             int TmpSelected = ListBoxOpened.SelectedIndex;
             if (TmpSelected >= 0)
             {
-                // Markiertes Objekt in ListBoxOpened löschen
+                // 刪除 ListBoxOpened 中選取的物件
                 ListBoxOpened.Items.Remove(ListBoxOpened.Items[TmpSelected]);
 
-                // Wenn sich darunter noch ein Element befindet, dann wird dieses ausgewählt
-                // Ansonsten ist kein Element ausgewählt
+                // 如果下方還有元素，則選取該元素
+                // 否則不選取任何元素
                 if (ListBoxOpened.Items.Count > TmpSelected)
                 {
                     ListBoxOpened.SelectedIndex = TmpSelected;
                 }
             }
-
         }
     }
 }

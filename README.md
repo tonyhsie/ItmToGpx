@@ -1,7 +1,5 @@
 # ITM To GPX
 
-**[Download here](https://github.com/Eusebius1920/itmtogpx/releases)**
-
 ## Converts any *.itm file of GPS Photo Tagger to a *.gpx file.
 
 With processing multiple files at the same time it makes exporting out of **GPS Photo Tagger** much easier. You can use the .gpx file for other programs supporting gpx.
