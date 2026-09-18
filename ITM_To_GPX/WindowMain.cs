@@ -42,6 +42,8 @@ namespace ITM_To_GPX
             // 建立一個供稍後使用的緩衝區
             byte[] Buffer = new Byte[4096];
 
+            int iConvertedFilesCount = 0;
+
             foreach (object TmpObject in ListBoxOpened.Items)
             {
                 // 初始化 ZipFile 以進行解壓縮
@@ -84,6 +86,8 @@ namespace ITM_To_GPX
 
                                 // 刪除 TmpOutput 暫存檔
                                 File.Delete(TmpFullPath);
+
+                                ++iConvertedFilesCount;
                             }
                         }
                     }
@@ -98,7 +102,7 @@ namespace ITM_To_GPX
                 }
             }
 
-            MessageBox.Show("Done!", "Converted", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(iConvertedFilesCount.ToString() + " files are converted!", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ListBoxOpened.Items.Clear();
         }
 

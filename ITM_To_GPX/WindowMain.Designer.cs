@@ -89,7 +89,7 @@
             this.Controls.Add(this.ButtonOpen);
             this.Controls.Add(this.ListBoxOpened);
             this.Name = "WindowMain";
-            this.Text = "ITM To GPX   (v260917)";
+            this.Text = "ITM To GPX   (v260918)";
             this.ResumeLayout(false);
 
         }
