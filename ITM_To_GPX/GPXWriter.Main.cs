@@ -11,6 +11,7 @@ namespace GPXWriter
         public class GPX
         {
             private string _Filename;
+            private string _Version;
             private ArrayList _Tracks;
             private ArrayList _WayPoints;
 
@@ -25,7 +26,15 @@ namespace GPXWriter
                     _Filename = Path.GetFullPath(value);
                 }
             }
-            
+
+            public string Version
+            {
+                get
+                {
+                    return _Version;
+                }
+            }
+
             public ArrayList Tracks
             {
                 get
@@ -33,7 +42,7 @@ namespace GPXWriter
                     return ArrayList.ReadOnly(_Tracks);
                 }
             }
-            
+
             public ArrayList WayPoints
             {
                 get
@@ -42,9 +51,10 @@ namespace GPXWriter
                 }
             }
 
-            public GPX(string Filename)
+            public GPX(string Filename, string Version)
             {
                 _Filename = Path.GetFullPath(Filename);
+                _Version = Version;
                 _Tracks = new ArrayList();
                 _WayPoints = new ArrayList();
             }
@@ -54,18 +64,18 @@ namespace GPXWriter
                 GPXWrite TmpWriteCache = new GPXWrite(this);
                 TmpWriteCache.Write();
             }
-            
+
             public void AddTrack(Utils.Track track)
             {
                 _Tracks.Add(track);
             }
-            
-            public void AddPoint(GPXWriter.Utils.Point point)
+
+            public void AddPoint(Utils.Point point)
             {
                 _WayPoints.Add(point);
             }
         }
-        
+
         public class GPXWrite
         {
             private GPX _GPX;
@@ -84,12 +94,9 @@ namespace GPXWriter
             private void WriteHeader()
             {
                 _OutputFile.WriteStartDocument();
-                _OutputFile.WriteStartElement("gpx");
-                _OutputFile.WriteAttributeString("xmlns", "http://www.topografix.com/GPX/1/1");
-                _OutputFile.WriteAttributeString("creator", "ITMtoGPX");
-                _OutputFile.WriteAttributeString("version", "v260917");
-                _OutputFile.WriteAttributeString("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-                _OutputFile.WriteAttributeString("xsi:schemaLocation", "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd");
+                _OutputFile.WriteStartElement("gpx", "http://www.topografix.com/GPX/1/1");
+                _OutputFile.WriteAttributeString("version", "1.1");
+                _OutputFile.WriteAttributeString("creator", $"ITMtoGPX {_GPX.Version}");
             }
 
             private void WriteBody()

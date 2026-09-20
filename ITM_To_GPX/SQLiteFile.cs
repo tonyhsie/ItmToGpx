@@ -49,7 +49,7 @@ namespace ITM_To_GPX
                 // 轉換結束
                 //----------------------------------------------------------------------------------------------------------------           
             }
-            
+
             private void _ReadTrackInformation(ArrayList TrackArray)
             {
                 // 對資料庫執行查詢
@@ -71,10 +71,10 @@ namespace ITM_To_GPX
                         SQLiteTracks TmpTrack = new SQLiteTracks();
 
                         // 讀取名稱
-                        TmpTrack.TrackName = (TmpRow[2]).ToString();
+                        TmpTrack.TrackName = TmpRow[2].ToString();
 
                         // 讀取 ID
-                        TmpTrack.ID = (int)(TmpRow[0]);
+                        TmpTrack.ID = (int)TmpRow[0];
 
                         // 讀取 FirstWP
                         TmpTrack.FirstWP = (int)TmpRow[9];
@@ -87,7 +87,7 @@ namespace ITM_To_GPX
                     }
                 }
             }
-            
+
             private void _GetTracks(ArrayList TrackInformation, GPX gpxfile)
             {
                 // 讀取對應的 SQLite 資料表
@@ -139,7 +139,7 @@ namespace ITM_To_GPX
                     gpxfile.AddTrack(track);
                 }
             }
-            
+
             private void _ReadWaypointInformation(ArrayList WaypointArray)
             {
                 // 對資料庫執行查詢
@@ -171,7 +171,7 @@ namespace ITM_To_GPX
                     }
                 }
             }
-            
+
             private void _GetWP(ArrayList WaypointInformation, GPX gpxfile)
             {
                 // 讀取對應的 SQLite 資料表
@@ -219,7 +219,7 @@ namespace ITM_To_GPX
             public int FirstWP;
             public int LastWP;
         }
-        
+
         public struct SQLiteWP
         {
             public int ID;

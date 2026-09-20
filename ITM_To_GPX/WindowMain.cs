@@ -10,6 +10,8 @@ namespace ITM_To_GPX
 {
     public partial class WindowMain : Form
     {
+        private readonly string _Version = "v260920";
+
         public WindowMain()
         {
             InitializeComponent();
@@ -22,7 +24,7 @@ namespace ITM_To_GPX
             // ListBoxOpened 之中
             OpenFileDialog TmpFileDialog = new OpenFileDialog();
             TmpFileDialog.Multiselect = true;
-            TmpFileDialog.Filter = "GPSPhototagger File (*.itm)|*.itm";
+            TmpFileDialog.Filter = "ITM File (*.itm)|*.itm";
 
             if (TmpFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -76,7 +78,7 @@ namespace ITM_To_GPX
 
                                 // 現在建立 GPX 與 SQL 物件
                                 SQLiteFile sqlitefile = new SQLiteFile(TmpFullPath);
-                                GPX gpxfile = new GPX(Path.Combine(sInputFileDir, Path.ChangeExtension(Path.GetFileName(TmpObject.ToString()), ".gpx")));
+                                GPX gpxfile = new GPX(Path.Combine(sInputFileDir, Path.ChangeExtension(Path.GetFileName(TmpObject.ToString()), ".gpx")), _Version);
 
                                 // 建立 Gpx 檔案
                                 sqlitefile.SQLiteToGPX(gpxfile);
@@ -102,7 +104,9 @@ namespace ITM_To_GPX
                 }
             }
 
-            MessageBox.Show(iConvertedFilesCount.ToString() + " files are converted!", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (iConvertedFilesCount > 0)
+                MessageBox.Show(iConvertedFilesCount.ToString() + " file" + (iConvertedFilesCount == 1 ? " is" : "s are") + " converted!", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             ListBoxOpened.Items.Clear();
         }
 
